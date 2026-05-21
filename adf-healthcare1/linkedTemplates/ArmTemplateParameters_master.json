@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "adf-healthcare1"
 		},
+		"DBW_healthcare_properties_typeProperties_existingClusterId": {
+			"value": "0521-083211-ch1k6aoy"
+		},
 		"LS_adls_properties_typeProperties_url": {
 			"value": "https://sthealthcarecap.dfs.core.windows.net"
 		},

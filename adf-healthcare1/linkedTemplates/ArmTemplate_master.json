@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-healthcare1"
 		},
+		"DBW_healthcare_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0521-083211-ch1k6aoy"
+		},
 		"LS_adls_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://sthealthcarecap.dfs.core.windows.net"
@@ -56,6 +60,9 @@
 					},
 					"LS_keyVault_properties_typeProperties_baseUrl": {
 						"value": "[parameters('LS_keyVault_properties_typeProperties_baseUrl')]"
+					},
+					"DBW_healthcare_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('DBW_healthcare_properties_typeProperties_existingClusterId')]"
 					},
 					"LS_adls_properties_typeProperties_url": {
 						"value": "[parameters('LS_adls_properties_typeProperties_url')]"

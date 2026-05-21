@@ -11,6 +11,10 @@
 			"type": "string",
 			"defaultValue": "https://kv-healthcare-capstone.vault.azure.net/"
 		},
+		"DBW_healthcare_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0521-083211-ch1k6aoy"
+		},
 		"LS_adls_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://sthealthcarecap.dfs.core.windows.net"
@@ -44,6 +48,30 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DBW_healthcare')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-7405606496918078.18.azuredatabricks.net",
+					"accessToken": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "LS_keyVault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "dbw-token"
+					},
+					"existingClusterId": "[parameters('DBW_healthcare_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_keyVault')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/LS_adls')]",
@@ -109,6 +137,10 @@
 					"file_name": {
 						"type": "string",
 						"defaultValue": "0"
+					},
+					"folder_name": {
+						"type": "string",
+						"defaultValue": "0"
 					}
 				},
 				"annotations": [],
@@ -120,7 +152,10 @@
 							"value": "@dataset().file_name",
 							"type": "Expression"
 						},
-						"folderPath": "raw/patients",
+						"folderPath": {
+							"value": "@dataset().folder_name",
+							"type": "Expression"
+						},
 						"fileSystem": "healthcare-data"
 					},
 					"columnDelimiter": ",",
@@ -418,6 +453,177 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_adls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Capstone_Healthcare')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy_patient_master",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_sql_patient",
+								"type": "DatasetReference",
+								"parameters": {
+									"table_name": "patient_master_seed"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_adls_raw",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_name": "patient_master_seed.csv",
+									"folder_name": "raw/patients"
+								}
+							}
+						]
+					},
+					{
+						"name": "copy_doctor_master",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "copy_patient_master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_sql_doctor",
+								"type": "DatasetReference",
+								"parameters": {
+									"table_name": "doctor_master_seed"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_adls_raw",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_name": "doctor_master_seed.csv",
+									"folder_name": "raw/doctors"
+								}
+							}
+						]
+					},
+					{
+						"name": "Healthcare_notebook",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "copy_doctor_master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/updazvmnag_1777788724049@npupgradassessment.onmicrosoft.com/Capstone_notebook"
+						},
+						"linkedServiceName": {
+							"referenceName": "DBW_healthcare",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_sql_patient')]",
+				"[concat(variables('factoryId'), '/datasets/DS_adls_raw')]",
+				"[concat(variables('factoryId'), '/datasets/DS_sql_doctor')]",
+				"[concat(variables('factoryId'), '/linkedServices/DBW_healthcare')]"
 			]
 		}
 	]
