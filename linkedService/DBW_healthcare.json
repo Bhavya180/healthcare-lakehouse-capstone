@@ -1,0 +1,19 @@
+{
+	"name": "DBW_healthcare",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-7405606496918078.18.azuredatabricks.net",
+			"accessToken": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_keyVault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "dbw-token"
+			},
+			"existingClusterId": "0521-083211-ch1k6aoy"
+		}
+	}
+}
