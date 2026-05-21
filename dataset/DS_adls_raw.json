@@ -9,6 +9,10 @@
 			"file_name": {
 				"type": "string",
 				"defaultValue": "0"
+			},
+			"folder_name": {
+				"type": "string",
+				"defaultValue": "0"
 			}
 		},
 		"annotations": [],
@@ -20,7 +24,10 @@
 					"value": "@dataset().file_name",
 					"type": "Expression"
 				},
-				"folderPath": "raw/patients",
+				"folderPath": {
+					"value": "@dataset().folder_name",
+					"type": "Expression"
+				},
 				"fileSystem": "healthcare-data"
 			},
 			"columnDelimiter": ",",
