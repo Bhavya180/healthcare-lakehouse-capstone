@@ -1,0 +1,51 @@
+{
+	"name": "DS_sql_doctor",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_sql",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"table_name": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "doctor_id",
+				"type": "nvarchar"
+			},
+			{
+				"name": "doctor_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "department",
+				"type": "nvarchar"
+			},
+			{
+				"name": "specialization",
+				"type": "nvarchar"
+			},
+			{
+				"name": "active_status",
+				"type": "nvarchar"
+			},
+			{
+				"name": "last_updated",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().table_name",
+				"type": "Expression"
+			}
+		}
+	}
+}

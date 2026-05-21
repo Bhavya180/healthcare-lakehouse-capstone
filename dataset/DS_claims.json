@@ -1,0 +1,73 @@
+{
+	"name": "DS_claims",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_adls",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"file_name": {
+				"type": "string",
+				"defaultValue": "0"
+			},
+			"folder_name": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().file_name",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().folder_name",
+					"type": "Expression"
+				},
+				"fileSystem": "healthcare-data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "claim_id",
+				"type": "String"
+			},
+			{
+				"name": "visit_id",
+				"type": "String"
+			},
+			{
+				"name": "patient_id",
+				"type": "String"
+			},
+			{
+				"name": "insurance_plan",
+				"type": "String"
+			},
+			{
+				"name": "claim_amount",
+				"type": "String"
+			},
+			{
+				"name": "claim_status",
+				"type": "String"
+			},
+			{
+				"name": "claim_date",
+				"type": "String"
+			},
+			{
+				"name": "rejection_reason",
+				"type": "String"
+			}
+		]
+	}
+}

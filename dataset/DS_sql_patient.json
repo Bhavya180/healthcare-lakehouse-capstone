@@ -1,0 +1,68 @@
+{
+	"name": "DS_sql_patient",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_sql",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"table_name": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "patient_id",
+				"type": "nvarchar"
+			},
+			{
+				"name": "patient_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "gender",
+				"type": "nvarchar"
+			},
+			{
+				"name": "dob",
+				"type": "date"
+			},
+			{
+				"name": "city",
+				"type": "nvarchar"
+			},
+			{
+				"name": "state",
+				"type": "nvarchar"
+			},
+			{
+				"name": "phone",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "insurance_plan",
+				"type": "nvarchar"
+			},
+			{
+				"name": "blood_group",
+				"type": "nvarchar"
+			},
+			{
+				"name": "last_updated",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().table_name",
+				"type": "Expression"
+			}
+		}
+	}
+}
